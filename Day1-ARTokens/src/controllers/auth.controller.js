@@ -34,7 +34,7 @@ let loginController = async (req, res) => {
     httpOnly: true,
     sameSite: "lax",
     secure: false,
-    maxAge: 10 * 60 * 1000,
+    maxAge: 60 * 1000,
   });
 
   res.cookie("refreshToken", refreshToken, {
@@ -44,7 +44,7 @@ let loginController = async (req, res) => {
     maxAge: 24 * 60 * 60 * 1000,
   });
 
-  return res.status(201).json({
+  return res.status(200).json({
     message: "User loggedIn",
     user: isExisted,
   });
