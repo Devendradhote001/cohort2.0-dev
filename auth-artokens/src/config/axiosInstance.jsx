@@ -5,22 +5,48 @@ export let axiosInstance = axios.create({
   withCredentials: true,
 });
 
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     let originalReq = error.config;
+
+//     if (error.response.status === 401 && !originalReq.retry) {
+//       originalReq.retry = true;
+
+//       try {
+//         await axiosInstance.get("/api/auth/get-accessToken");
+//         return axiosInstance(originalReq);
+//       } catch (error) {
+//         window.location.href = "/";
+//         return Promise.reject(error);
+//       }
+//     }
+//   }
+// );
+
 axiosInstance.interceptors.response.use(
   (response) => response,
+
   async (error) => {
-    let originalReq = error.config;
+    const originalRequest = error.config;
 
-    if (error.response.status === 401 || !originalReq.retry) {
-      originalReq.retry = true;
-
+    if (
+      error.response?.status === 401 &&
+      !originalRequest.retry &&
+      originalRequest.url !== "/api/auth/me"
+    ) {
+      originalRequest.retry = true;
 
       try {
         await axiosInstance.get("/api/auth/get-accessToken");
-        return axiosInstance(originalReq);
-      } catch (error) {
+
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
         window.location.href = "/";
-        return Promise.reject(error);
+        return Promise.reject(refreshError);
       }
     }
+
+    return Promise.reject(error);
   }
 );

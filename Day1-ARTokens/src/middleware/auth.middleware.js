@@ -22,7 +22,9 @@ let authMiddleware = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    throw new Error(error);
+    return res.status(404).json({
+      message: "Unauthorized",
+    });
   }
 };
 
